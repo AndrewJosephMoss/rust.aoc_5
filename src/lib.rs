@@ -9,7 +9,29 @@ use nom::{
 };
 
 pub fn process_part_2(input: &str) -> String {
-    "MCD".to_owned()
+    let mut parsed_crates = parse_crate_stacks(&input);
+    let moves = parse_move_lines(&input);
+    for mv in moves {
+        let count = mv[0] as usize;
+        let from = (mv[1] - 1) as usize;
+        let to = (mv[2] - 1) as usize;
+        let drain_range = (parsed_crates[from].len() - count)..;
+        for c in parsed_crates[from]
+            .drain(drain_range)
+            .collect::<Vec<&str>>()
+        {
+            parsed_crates[to].push(c);
+        }
+    }
+    let mut top_crates: Vec<&str> = Vec::<&str>::new();
+    for mut c in parsed_crates {
+        let top = c.pop();
+        if let Some(val) = top {
+            top_crates.push(val);
+        }
+    }
+    let top_str = top_crates.join("");
+    top_str
 }
 
 pub fn process_part_1(input: &str) -> String {
